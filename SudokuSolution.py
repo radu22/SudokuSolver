@@ -11,7 +11,7 @@ def draw(cell):
     pygame.draw.rect(main.screen, cell.cell_color, pygame.Rect(x, y, w, h))
     pygame.draw.rect(main.screen, cell.border_color, pygame.Rect(x, y, w, h), stg.border)
     if value != 0:
-        text = main.font.render(str(value), True, (0, 0, 0))
+        text = main.font.render(str(value), True, cell.value_color)
         main.screen.blit(text,
                          (x + text.get_height() // 2, y + text.get_width() // 2))
 
@@ -26,7 +26,7 @@ def draw_table(table):
     pygame.time.wait(5)
 
 
-def mark_invalid(cell):
+def mark_invalid(cell, delay):
     x, y = cell.get_xy()
     w, h = cell.get_wh()
     value = cell.get_value()
@@ -39,11 +39,12 @@ def mark_invalid(cell):
 
         main.draw_border()
         pygame.display.flip()
-        pygame.time.wait(30)
+        pygame.time.wait(delay)
 
-    pygame.time.wait(100
-                     )
-def mark_valid(cell):
+    pygame.time.wait(delay * 2)
+
+
+def mark_valid(cell, delay):
     x, y = cell.get_xy()
     w, h = cell.get_wh()
     value = cell.get_value()
@@ -56,7 +57,7 @@ def mark_valid(cell):
         main.draw_border()
         pygame.display.flip()
 
-        pygame.time.wait(30)
+        pygame.time.wait(delay)
     for _ in range(2):
         pygame.draw.rect(main.screen, cell.cell_color, pygame.Rect(x, y, w, h))
         pygame.draw.rect(main.screen, cell.border_color, pygame.Rect(x, y, w, h), stg.border)
@@ -66,14 +67,14 @@ def mark_valid(cell):
                              (x + text.get_height() // 2, y + text.get_width() // 2))
         main.draw_border()
         pygame.display.flip()
-        pygame.time.wait(200)
+        pygame.time.wait(delay * 10)
 
         pygame.draw.rect(main.screen, stg.colors["white"], pygame.Rect(x, y, w, h))
         pygame.draw.rect(main.screen, cell.border_color, pygame.Rect(x, y, w, h), stg.border)
         main.draw_border()
 
         pygame.display.flip()
-        pygame.time.wait(200)
+        pygame.time.wait(delay * 10)
 
 
 def validation(table, row, col, value):
@@ -116,7 +117,7 @@ def move_back(table, row, col):
             col = 8
         if table[row][col].get_locked_value() == 0:
             table[row][col].change_color(stg.colors["red"])
-          # mark_invalid(table[row][col])
+            # mark_invalid(table[row][col])
             return row, col
 
 
@@ -141,7 +142,7 @@ def move_forward(table, row, col):
             return row, col
 
 
-def SudokuSolver(table):
+def SudokuSolver(table, delay):
     """
         Is basically a backtracking algorithm going through every empty spot using the move_forward function, placing in the first valid value
         and when it can't find any valid option for a spot it is using move_back function to modify the last value it placed
@@ -168,7 +169,7 @@ def SudokuSolver(table):
                 # print('Am pus',table[row][col])     #debug print
 
                 possible_value = 1
-                mark_valid(table[row][col])
+                # mark_valid(table[row][col], delay)
                 row, col = move_forward(table, row, col)
             else:
                 # print(possible_value, "nevalid")   #debug print
