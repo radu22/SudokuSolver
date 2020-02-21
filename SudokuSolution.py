@@ -1,5 +1,4 @@
 import main
-import Class
 import pygame
 import Settings as stg
 
@@ -142,7 +141,7 @@ def move_forward(table, row, col):
             return row, col
 
 
-def SudokuSolver(table, delay):
+def SudokuSolver(table, delay, stop):
     """
         Is basically a backtracking algorithm going through every empty spot using the move_forward function, placing in the first valid value
         and when it can't find any valid option for a spot it is using move_back function to modify the last value it placed
@@ -157,6 +156,15 @@ def SudokuSolver(table, delay):
         row, col = move_forward(table, row, col)
 
     while 9 > row >= 0:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+                quit()
+            if event.type == pygame.MOUSEBUTTONUP:
+                pos_x, pos_y = pygame.mouse.get_pos()
+                if stop.is_over((pos_x, pos_y)):
+                    stop.change_text("Magic!")
+                    return False
         # table[row][col].change_color(stg.colors["white"])
         if possible_value != 10:
             if validation(table, row, col, possible_value):
@@ -184,7 +192,7 @@ def SudokuSolver(table, delay):
 
         # print(row, col, possible_value)            #debug print
         draw_table(table)
-
+    return True
 # print(np.matrix(table))
 
 
@@ -199,3 +207,5 @@ def SudokuSolver(table, delay):
 #             print(i, 'invalid')
 #
 # # test_validare(0,0)
+
+print("SudokuSolution file loaded")

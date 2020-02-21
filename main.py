@@ -2,6 +2,8 @@ import pygame
 import Class as cls
 import Settings as stg
 import SudokuSolution
+import inputs as inp
+from random import choice
 
 done = False
 pygame.init()
@@ -9,48 +11,30 @@ screen = pygame.display.set_mode((stg.xScreen + 400, stg.yScreen + stg.offset + 
 screen.fill(stg.backgroundColor)
 fonts = pygame.font.get_fonts()
 font = pygame.font.SysFont(fonts[12], 32)
-# pygame.draw.rect(screen, stg.colors["grey"],
-#                  pygame.Rect(10, 10, stg.xScreen + stg.offset * 2 - 20, stg.yScreen + stg.offset * 2 - 20))
 pygame.draw.rect(screen, stg.colors["grey"],
-                 pygame.Rect(10, 10, stg.xScreen + - 20, stg.yScreen - 20))
+                 pygame.Rect(stg.offset / 2, stg.offset / 2, stg.xScreen + stg.offset, stg.yScreen + stg.offset))
 
 # font = pygame.font.SysFont("comicsansms", 32)
 # print(fonts)
 
 
-sudoku = [[6, 8, 5, 0, 3, 0, 4, 0, 7],
-          [0, 0, 0, 8, 0, 0, 0, 2, 0],
-          [0, 1, 0, 4, 0, 0, 5, 0, 0],
-          [0, 9, 0, 3, 0, 0, 0, 0, 5],
-          [0, 4, 0, 0, 0, 0, 6, 0, 0],
-          [5, 0, 8, 0, 0, 4, 0, 3, 0],
-          [9, 2, 6, 0, 7, 8, 3, 0, 0],
-          [8, 0, 0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 3, 0, 0, 0, 0, 1, 9]]
-
-
-# def button(status):
-#     if status == "nothing":
-#         pygame.draw.rect(screen, stg.colors["button-green"],
-#                          pygame.Rect(stg.xScreen + 150, stg.yScreen - 100, 150, 50))
-#         text = font.render("Click me!", True, (0, 0, 0))
-#         screen.blit(text,
-#                     (stg.xScreen + 150 + text.get_height() // 2, stg.yScreen - 100 + text.get_width() // 2))
-#
-#     elif status == "hover":
-#         pygame.draw.rect(screen, stg.colors["button-hover-green"],
-#                          pygame.Rect(stg.xScreen + 150, stg.yScreen - 100, 150, 50)),
-#     elif status == "clicked":
-#         pygame.draw.rect(screen, stg.colors["grey"],
-#                          pygame.Rect(stg.xScreen + 150, stg.yScreen - 100, 150, 50)),
-
-
-def create_cells(cell_list):
+def create_cells(cell_list, sudoku):
     for i in range(9):
         a = []
         for j in range(9):
-            a.append(cls.Cell(60 * j + stg.offset, 60 * i + stg.offset, sudoku[i][j], (i // 3 + j // 3) + (i // 3) * 2))
+            a.append(cls.Cell(60 * j + stg.offset, 60 * i + stg.offset, sudoku[0][i][j], (i // 3 + j // 3) + (i // 3) * 2))
         cell_list.append(a)
+
+
+def new_sudoku(cells, sudoku):
+    for i in range(9):
+        for j in range(9):
+            cells[i][j].default()
+
+    for i in range(9):
+        for j in range(9):
+            cells[i][j].change_locked_value(sudoku[i][j])
+
 
 
 def draw_border():
@@ -104,7 +88,6 @@ def draw_table(cell_list):
 
 def write_value(cell, value, status):
     x, y = cell.get_xy()
-    # cell.change_value(value)
     if status:
         text = font.render(str(value), True, cell.get_value_color())
         screen.blit(text,
@@ -117,8 +100,6 @@ def write_value(cell, value, status):
 
 def mark_clicked(cell):
     x, y = cell.get_xy()
-    print(x, y)
-    # if cell.family_focus or cell.get_color() == stg.colors["family"]:
     for i in range(9):
         for j in range(9):
             cells[i][j].change_state_false()
@@ -140,14 +121,17 @@ def clicked(cell, solved):
         if cell.get_locked_value() == 0:
             cell.change_focus_state()
             while cell.focus:
-                # cell.change_state()
                 for ev in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        done = True
+                        quit()
                     if ev.type == pygame.MOUSEBUTTONDOWN:
                         pos_x, pos_y = pygame.mouse.get_pos()
-                        print(pos_x,pos_y)
                         if stg.offset < pos_x < stg.xScreen + stg.offset and stg.offset < pos_y < stg.yScreen + stg.offset:
                             cell.change_focus_state()
-                            clicked(cells[pos_y // (cls.Cell.width + stg.offset)][pos_x // (cls.Cell.height + stg.offset)], solved_status)
+                            clicked(
+                                cells[(pos_y - stg.offset) // cls.Cell.width][(pos_x - stg.offset) // cls.Cell.height],
+                                solved_status)
                         else:
                             reset_colors(cells)
                             draw_table(cells)
@@ -165,44 +149,11 @@ def clicked(cell, solved):
                             input_status = False
                         cell.change_value(int(number))
                         cell.change_value_color(input_status)
-                        # cell.change_locked_value(int(number))
-                        # write_value(cell, cell.get_value(), input_status)
                         mark_clicked(cell)
-                        draw_table(cells)
-                        pygame.display.flip()
 
-                # cell.change_state()
+                    draw_table(cells)
+                    pygame.display.flip()
 
-
-# def clicked(cell, solved):
-#     mark_clicked(cell)
-#     draw_table(cells)
-#     pygame.display.flip()
-#     input_status = False
-#     if not solved:
-#         if cell.get_locked_value() == 0:
-#             cell.change_state()
-#             while not cell.state:
-#                 # cell.change_state()
-#                 for ev in pygame.event.get():
-#                     if ev.type == pygame.MOUSEBUTTONDOWN:
-#                         pos_x, pos_y = pygame.mouse.get_pos()
-#                         if 10 < pos_x < stg.xScreen and 10 < pos_y < stg.yScreen:
-#                             clicked(cells[pos_y // cls.Cell.width][pos_x // cls.Cell.height], solved_status)
-#
-#                     if ev.type == pygame.KEYDOWN:
-#                         number = numbers(ev.key)
-#                         if number == "#":
-#                             number = "0"
-#                         if input_validation(cell, int(number)):
-#                             input_status = True
-#                         else:
-#                             input_status = False
-#                         cell.change_value(int(number))
-#                         cell.change_value_color(input_status)
-#                         # cell.change_locked_value(int(number))
-#                         write_value(cell, cell.get_value(), input_status)
-#                         cell.change_state()
 
 
 def numbers(argument):
@@ -223,12 +174,13 @@ def numbers(argument):
 def reset_colors(cells):
     for i in range(9):
         for j in range(9):
-            cells[i][j].default()
+            cells[i][j].deselect()
 
 
 def redraw(cells):
     for i in range(9):
         for j in range(9):
+            cells[i][j].set_default_colors()
             cells[i][j].change_value(cells[i][j].get_locked_value())
     draw_table(cells)
     pygame.display.flip()
@@ -276,12 +228,12 @@ def display_text():
                  40 + (60 / 2 - title_text.get_height() / 2)))
 
     desc_font = pygame.font.SysFont("comicsansms", 22)
-    desc_text = desc_font.render("red means bad", True, (0, 0, 0))
+    desc_text = desc_font.render("red means bad", True, stg.colors["red2"])
     screen.blit(desc_text,
                 ((stg.xScreen + 100) + 10,
                  40 + (200 / 2 - desc_text.get_height() / 2)))
 
-    desc_text2 = desc_font.render("blue means good", True, (0, 0, 0))
+    desc_text2 = desc_font.render("blue means good", True, stg.colors["blue2"])
     screen.blit(desc_text2,
                 ((stg.xScreen + 100) + 10,
                  40 + (280 / 2 - desc_text2.get_height() / 2)))
@@ -294,10 +246,14 @@ def display_text():
 
 if __name__ == "__main__":
     cells = []
-    create_cells(cells)
+    create_cells(cells, inp.sudoku)
+    current_sudoku = 0
     draw_table(cells)
     button = cls.Button(stg.colors["button-green"], stg.xScreen + 150, stg.yScreen - 100, 170, 50, "Magic!")
+    new_game = cls.Button(stg.colors["white"], stg.xScreen + 175, stg.yScreen - 30, 120, 30, "New Game",
+                          stg.colors["button-blue"], 30)
     button.draw(screen, 1)
+    new_game.draw(screen)
     display_text()
     solved_status = False
     while not done:
@@ -308,30 +264,38 @@ if __name__ == "__main__":
         else:
             button.change_color(stg.colors["button-green"])
             button.draw(screen)
+        if new_game.is_over((x_mouse, y_mouse)):
+            new_game.change_text_color(stg.colors["button-hover-blue"])
+            new_game.draw(screen)
+        else:
+            new_game.change_text_color(stg.colors["button-blue"])
+            new_game.draw(screen)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
+                quit()
             if event.type == pygame.MOUSEBUTTONUP:
                 pos_x, pos_y = pygame.mouse.get_pos()
                 if stg.offset < pos_x < stg.xScreen + stg.offset and stg.offset < pos_y < stg.yScreen + stg.offset:
-                    clicked(cells[pos_y // (cls.Cell.width + stg.offset)][pos_x // (cls.Cell.height + stg.offset)], solved_status)
+                    clicked(cells[(pos_y - stg.offset) // cls.Cell.width][(pos_x - stg.offset) // cls.Cell.height],
+                            solved_status)
                 else:
                     reset_colors(cells)
                     pygame.display.flip()
 
                 if button.is_over((pos_x, pos_y)):
-                    button.change_text("Hackerman")
+                    button.change_text("Stop")
                     button.draw(screen, 1)
                     redraw(cells)
-                    SudokuSolution.SudokuSolver(cells, 0)
-                    solved_status = True
-
-            # if event.type == pygame.KEYDOWN:
-            #     if event.key == pygame.K_SLASH:
-            #         redraw(cells)
-            #         SudokuSolution.SudokuSolver(cells, 0)
-            #         solved_status = True
+                    solved_status = SudokuSolution.SudokuSolver(cells, 0, button)
+                if new_game.is_over((pos_x, pos_y)):
+                    x=choice(inp.sudoku)
+                    while x == current_sudoku:
+                        x = choice(inp.sudoku)
+                    new_sudoku(cells, x)
+                    current_sudoku = x
+                    draw_table(cells)
 
         draw_table(cells)
         pygame.display.flip()

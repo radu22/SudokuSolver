@@ -3,13 +3,15 @@ import Settings as stg
 
 
 class Button:
-    def __init__(self, color, x, y, width, height, text=''):
+    def __init__(self, color, x, y, width, height, text='', text_color=(0,0,0), text_size = 40):
         self.color = color
         self.x = x
         self.y = y
         self.width = width
         self.height = height
         self.text = text
+        self.text_color = text_color
+        self.text_size = text_size
 
     def draw(self, win, outline=None):
         # Call this method to draw the button on the screen
@@ -19,8 +21,8 @@ class Button:
         pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.height), 0)
 
         if self.text != '':
-            font = pygame.font.SysFont('comicsans', 40)
-            text = font.render(self.text, 1, (0, 0, 0))
+            font = pygame.font.SysFont('comicsans', self.text_size)
+            text = font.render(self.text, 1, self.text_color)
             win.blit(text, (
                 self.x + (self.width / 2 - text.get_width() / 2), self.y + (self.height / 2 - text.get_height() / 2)))
 
@@ -37,6 +39,9 @@ class Button:
 
     def change_text(self, text):
         self.text = text
+
+    def change_text_color(self, color):
+        self.text_color = color
 
 
 class Cell:
@@ -58,9 +63,14 @@ class Cell:
         self.locked_value = locked_value
         if locked_value != 0:
             self.value_color = (0, 0, 0)
+        else:
+            self.value_color = stg.colors["blue2"]
         self.value = locked_value
         self.block = block
         self.state = False
+
+    # def __del__(self):
+    #     print("Object deleted")
 
     def get_xy(self):
         return self.x, self.y
@@ -101,21 +111,6 @@ class Cell:
     def change_color(self, color):
         self.cell_color = color
 
-    # def clicked(self):
-    #     pygame.draw.rect(screen, self.green, pygame.Rect(self.x, self.y, self.width, self.height))
-    #     self.state = True
-    #     while self.state:
-    #         pygame.draw.rect(screen, self.green, pygame.Rect(self.x, self.y, self.width, self.height))
-    #         for event in pygame.event.get():
-    #             if event.type == pygame.KEYDOWN:
-    #                 number = numbers(event.key)
-    #                 if number == "#":
-    #                     number = "0"
-    #                 self.value = int(number)
-    #                 self.locked_value = self.value
-    #                 cells[self.y // Cell.width][self.x // Cell.height].write_number(number)
-    #                 self.state = False
-
     def change_state_false(self):
         self.state = False
 
@@ -125,10 +120,24 @@ class Cell:
     def change_focus_state(self):
         self.focus = not self.focus
 
-    def default(self):
+    def set_default_colors(self):
+        if self.locked_value != 0:
+            self.value_color = (0, 0, 0)
+        else:
+            self.value_color = stg.colors["blue2"]
+
+    def deselect(self):
         self.cell_color = stg.colors["white"]
         self.state = False
         self.focus = False
 
+    def default(self):
+        self.deselect()
+        if self.locked_value != 0:
+            self.value_color = (0, 0, 0)
+        else:
+            self.value_color = stg.colors["blue2"]
+        self.value = 0
+        self.locked_value = 0
 
-print("Salut")
+print("Class file loaded")

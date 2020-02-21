@@ -1,6 +1,6 @@
 import pygame
 
-offset = 0
+offset = 20
 xCell = 60
 yCell = 60
 xBlock = 3 * xCell
@@ -22,9 +22,12 @@ colors = {
     "family": (226, 231, 237),
     "selected": (187, 222, 251),
     "button-green": (76, 175, 80),
-    "button-hover-green": (84, 196, 89)
+    "button-hover-green": (84, 196, 89),
+    "button-blue":(61, 192, 212),
+    "button-hover-blue": (69, 215, 237)
 }
 
 backgroundColor = colors["white"]
 clock = pygame.time.Clock()
-# 237, 29, 14
+
+print("Settings file loaded")
