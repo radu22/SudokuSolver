@@ -1,3 +1,8 @@
+"""
+   All the sudoku tables currently available
+
+   TO DO:   Sudoku table generator !!!!!!!!!!!!
+"""
 sudoku = [
          [[6, 8, 5, 0, 3, 0, 4, 0, 7],
           [0, 0, 0, 8, 0, 0, 0, 2, 0],

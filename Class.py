@@ -3,7 +3,7 @@ import Settings as stg
 
 
 class Button:
-    def __init__(self, color, x, y, width, height, text='', text_color=(0,0,0), text_size = 40):
+    def __init__(self, color, x, y, width, height, text='', text_color=(0, 0, 0), text_size=40):
         self.color = color
         self.x = x
         self.y = y
@@ -14,7 +14,7 @@ class Button:
         self.text_size = text_size
 
     def draw(self, win, outline=None):
-        # Call this method to draw the button on the screen
+        """ Call this method to draw the button on the screen """
         if outline:
             pygame.draw.rect(win, outline, (self.x - 2, self.y - 2, self.width + 4, self.height + 4), 0)
 
@@ -27,7 +27,7 @@ class Button:
                 self.x + (self.width / 2 - text.get_width() / 2), self.y + (self.height / 2 - text.get_height() / 2)))
 
     def is_over(self, pos):
-        # Pos is the mouse position or a tuple of (x,y) coordinates
+        """ Pos is the mouse position or a tuple of (x,y) coordinates """
         if self.x < pos[0] < self.x + self.width:
             if self.y < pos[1] < self.y + self.height:
                 return True
@@ -48,14 +48,14 @@ class Cell:
     width = 60
     height = 60
     value = 0
-    locked_value = 0
+    locked_value = 0   # The value implemented by the game
     border = 1
     border_color = stg.colors["grey"]
     cell_color = stg.colors["white"]
     value_color = stg.colors["blue2"]
     block = 0
     focus = False
-    state = False
+    state = False  #family state
 
     def __init__(self, x, y, locked_value, block):
         self.x = x
@@ -88,6 +88,7 @@ class Cell:
         self.value = x
 
     def change_value_color(self, state):
+        """ Changes user's input color """
         if state:
             self.value_color = stg.colors["blue2"]
         else:
@@ -121,17 +122,20 @@ class Cell:
         self.focus = not self.focus
 
     def set_default_colors(self):
+        """ Resets the colors """
         if self.locked_value != 0:
             self.value_color = (0, 0, 0)
         else:
             self.value_color = stg.colors["blue2"]
 
     def deselect(self):
+        """ Gets the cell the deselected proprieties"""
         self.cell_color = stg.colors["white"]
         self.state = False
         self.focus = False
 
     def default(self):
+        """ Gets the cell to the default proprieties"""
         self.deselect()
         if self.locked_value != 0:
             self.value_color = (0, 0, 0)
@@ -139,5 +143,6 @@ class Cell:
             self.value_color = stg.colors["blue2"]
         self.value = 0
         self.locked_value = 0
+
 
 print("Class file loaded")
